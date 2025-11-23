@@ -16,7 +16,7 @@ from backend.routes import auth, documents, chat
 # Initialize FastAPI app
 app = FastAPI(
     title="Legal RAG API",
-    description="AI-Powered Legal Document Analysis System with Hugging Face + Groq",
+    description="AI-Powered Legal Document Analysis System with Hugging Face + OpenRouter",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -57,7 +57,7 @@ async def health_check():
             "status": "healthy",
             "database": "connected",
             "documents_count": len(docs),
-            "api_configured": bool(cfg.GROQ_API_KEY)
+            "api_configured": bool(cfg.OPENROUTER_API_KEY)
         }
     except Exception as e:
         return JSONResponse(

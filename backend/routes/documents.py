@@ -49,12 +49,11 @@ async def list_documents():
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_document(
-    file: UploadFile = File(...),
-    user: dict = Depends(require_auth)
+    file: UploadFile = File(...)
 ):
     """
     Upload and index a PDF document
-    Requires admin authentication
+    Public endpoint - no auth required for demo
     """
     # Validate file type
     if not file.filename.endswith('.pdf'):
@@ -79,12 +78,11 @@ async def upload_document(
 
 @router.post("/upload-multiple")
 async def upload_multiple_documents(
-    files: List[UploadFile] = File(...),
-    user: dict = Depends(require_auth)
+    files: List[UploadFile] = File(...)
 ):
     """
     Upload and index multiple PDF documents
-    Requires admin authentication
+    Public endpoint - no auth required for demo
     """
     results = []
     errors = []
@@ -117,12 +115,11 @@ async def upload_multiple_documents(
 
 @router.delete("/{collection_name}", response_model=DeleteResponse)
 async def delete_doc(
-    collection_name: str,
-    user: dict = Depends(require_auth)
+    collection_name: str
 ):
     """
     Delete a document from the database
-    Requires admin authentication
+    Public endpoint - no auth required for demo
     """
     try:
         success = delete_document(client, collection_name)

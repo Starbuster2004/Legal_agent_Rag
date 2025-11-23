@@ -1,0 +1,7 @@
+{
+  "name": "LegalRAG - Justice Simplified",
+  "description": "A comprehensive legal research and assistance platform featuring AI-powered summaries, daily legal updates, and an advocate finder.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

@@ -8,10 +8,12 @@ def chat(prompt: str, max_tokens: int = 2048) -> str:
     # Try with retries and exponential backoff
     for attempt in range(3):
         try:
-            r = requests.post('https://api.groq.com/openai/v1/chat/completions',
+            r = requests.post('https://openrouter.ai/api/v1/chat/completions',
                               headers={
-                                  'Authorization': f'Bearer {cfg.GROQ_API_KEY}',
-                                  'Content-Type': 'application/json'
+                                  'Authorization': f'Bearer {cfg.OPENROUTER_API_KEY}',
+                                  'Content-Type': 'application/json',
+                                  'HTTP-Referer': 'http://localhost:3000', # Optional, for including your app on openrouter.ai rankings.
+                                  'X-Title': 'Legal Agent RAG', # Optional. Shows in rankings on openrouter.ai.
                               }, 
                               json=body, 
                               timeout=60)
@@ -22,4 +24,4 @@ def chat(prompt: str, max_tokens: int = 2048) -> str:
             if attempt < 2:
                 time.sleep(2 ** attempt)  # Wait 1s, then 2s, then 4s
                 continue
-            return f"Error calling Groq API after {attempt+1} attempts: {str(e)}. Please check: 1) Internet connection, 2) API key validity at https://console.groq.com"
+            return f"Error calling OpenRouter API after {attempt+1} attempts: {str(e)}. Please check: 1) Internet connection, 2) API key validity at https://openrouter.ai/keys"

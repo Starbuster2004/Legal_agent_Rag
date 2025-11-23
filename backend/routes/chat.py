@@ -48,3 +48,43 @@ async def chat(request: ChatRequest):
     Alternative chat endpoint (same as /query)
     """
     return await chat_query(request)
+
+@router.post("/stream")
+async def chat_stream(request: ChatRequest):
+    """
+    Streaming chat endpoint for faster perceived response time
+    """
+    from fastapi.responses import StreamingResponse
+    import json
+    
+    async def generate():
+        try:
+            # Convert chat history to expected format
+            chat_history = [
+                {"role": msg.role, "content": msg.content}
+                for msg in request.chat_history
+            ] if request.chat_history else []
+            
+            # Run RAG (this still takes time but we can stream the result)
+            answer = run_rag(
+                query=request.query,
+                client=client,
+                top_k=request.top_k,
+                chat_history=chat_history
+            )
+            
+            # Stream the answer word by word for better UX
+            words = answer.split()
+            for i, word in enumerate(words):
+                chunk = word + (" " if i < len(words) - 1 else "")
+                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            
+            # Send done signal
+            yield f"data: {json.dumps({'done': True})}\n\n"
+            
+        except Exception as e:
+            error_msg = f"Error processing query: {str(e)}"
+            yield f"data: {json.dumps({'error': error_msg})}\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/event-stream")
+

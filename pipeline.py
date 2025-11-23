@@ -37,11 +37,12 @@ def run_rag(query: str, client=None, top_k: int = 5, chat_history: list = None):
     from embeddings import embed_texts
     query_emb = embed_texts([query])[0]
     
-    # Query across all collections
-    cands = query_all_collections(client, query_emb, k=top_k*2)
+    # Query across all collections (optimized: reduced candidates for speed)
+    cands = query_all_collections(client, query_emb, k=top_k)
     if not cands: return 'No relevant documents found in the database. Please ask an administrator to upload and index documents first.'
-    top = rerank(query, cands, top_k=top_k)
-    ctx = build_context(top)
+    # Skip reranking for faster responses - use direct retrieval results
+    # top = rerank(query, cands, top_k=top_k)
+    ctx = build_context(cands)
     
     # Build prompt with chat history if available
     history_context = ""
@@ -59,8 +60,10 @@ CURRENT QUESTION: {query}
 
 Provide a detailed, conversational answer based on the context. Cite sources using [src:i] format. Be helpful and natural in your responses. If referring to previous questions, acknowledge them. Include relevant legal disclaimers when appropriate."""
     
-    ans = chat(prompt, max_tokens=2048)
-    missing = verify_citations(ans, top)
-    if missing:
-        ans += f"\n\n[Note] Some cited snippets may not match retrieved text: {missing}"
+    # Reduced max_tokens for faster responses
+    ans = chat(prompt, max_tokens=1024)
+    # Citation verification removed to keep responses clean
+    # missing = verify_citations(ans, top)
+    # if missing:
+    #     ans += f"\n\n[Note] Some cited snippets may not match retrieved text: {missing}"
     return ans

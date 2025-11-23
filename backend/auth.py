@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import cfg
 
 # JWT Configuration
-SECRET_KEY = cfg.GROQ_API_KEY or "your-secret-key-change-in-production"
+SECRET_KEY = cfg.OPENROUTER_API_KEY or "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"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
